@@ -169,8 +169,9 @@ export default function RetailerPage() {
                   </div>
                   <div className="text-right">
                     <span className="text-sm text-muted-foreground">{ts.count}</span>
-                    <span className="block text-xs text-deal-green flex items-center gap-0.5 justify-end"><ArrowUp className="w-3 h-3" />{ts.growth}%</span>
+                    <span className="text-xs text-deal-green flex items-center gap-0.5 justify-end"><ArrowUp className="w-3 h-3" />{ts.growth}%</span>
                   </div>
+                
                 </div>
               ))}
             </div>
