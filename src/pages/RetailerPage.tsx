@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Plus, TrendingUp, Package, Percent, Clock, Search, BarChart3, ArrowUp } from "lucide-react";
+import { LayoutDashboard, Plus, TrendingUp, Package, Percent, Clock, Search, BarChart3, ArrowUp, Eye, Trash2 } from "lucide-react";
 
 interface RetailerProduct {
   id: string;
@@ -50,38 +50,38 @@ export default function RetailerPage() {
   const removeProduct = (id: string) => setMyProducts(myProducts.filter((p) => p.id !== id));
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-24 md:pb-12">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="w-8 h-8 text-primary" /> Retailer Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Manage your products, offers, and view analytics</p>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="w-7 h-7 text-primary" /> Retailer Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">Manage products, offers, and analytics</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} className="gradient-primary text-primary-foreground px-5 py-3 rounded-xl font-semibold flex items-center gap-2"><Plus className="w-4 h-4" /> Add Product</button>
+          <button onClick={() => setShowForm(!showForm)} className="gradient-primary text-primary-foreground px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg"><Plus className="w-4 h-4" /> Add Product</button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
             { icon: Package, label: "Products", value: myProducts.length.toString() },
             { icon: Percent, label: "Avg Discount", value: myProducts.length ? Math.round(myProducts.reduce((s, p) => s + p.discountPercent, 0) / myProducts.length) + "%" : "0%" },
-            { icon: TrendingUp, label: "Views Today", value: "1,234" },
+            { icon: Eye, label: "Views Today", value: "1,234" },
             { icon: Clock, label: "Active Offers", value: myProducts.length.toString() },
           ].map((stat) => (
-            <div key={stat.label} className="glass rounded-2xl p-5 text-center">
-              <stat.icon className="w-6 h-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-display font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
+            <div key={stat.label} className="bg-card rounded-xl p-4 text-center border border-border/50 shadow-card">
+              <stat.icon className="w-5 h-5 text-primary mx-auto mb-2" />
+              <div className="text-xl font-bold text-foreground">{stat.value}</div>
+              <div className="text-xs text-muted-foreground">{stat.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
             {showForm && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} onSubmit={handleAdd} className="glass rounded-2xl p-6 space-y-4">
-                <h3 className="font-display font-semibold text-foreground">Add New Product</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} onSubmit={handleAdd} className="bg-card rounded-2xl p-6 space-y-4 border border-border/50 shadow-card">
+                <h3 className="font-bold text-foreground text-sm">Add New Product</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {[
                     { key: "name", label: "Product Name", type: "text", placeholder: "e.g. Oreo Biscuit" },
                     { key: "storeName", label: "Store Name", type: "text", placeholder: "e.g. My Store" },
@@ -90,37 +90,37 @@ export default function RetailerPage() {
                     { key: "offerDuration", label: "Offer Duration", type: "text", placeholder: "e.g. 7 days" },
                   ].map((field) => (
                     <div key={field.key}>
-                      <label className="text-sm text-muted-foreground">{field.label}</label>
-                      <input type={field.type} placeholder={field.placeholder} value={form[field.key as keyof typeof form]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} required className="w-full glass rounded-lg px-4 py-2 mt-1 text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+                      <label className="text-xs text-muted-foreground">{field.label}</label>
+                      <input type={field.type} placeholder={field.placeholder} value={form[field.key as keyof typeof form]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} required className="w-full bg-muted/30 rounded-lg px-4 py-2 mt-1 text-foreground placeholder:text-muted-foreground outline-none border border-border/50 focus:ring-2 focus:ring-primary/20 text-sm" />
                     </div>
                   ))}
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" className="gradient-primary text-primary-foreground px-6 py-2 rounded-xl font-semibold">Save Product</button>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2 rounded-xl text-muted-foreground hover:text-foreground">Cancel</button>
+                  <button type="submit" className="gradient-primary text-primary-foreground px-5 py-2 rounded-xl font-medium text-sm shadow-lg">Save Product</button>
+                  <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2 rounded-xl text-muted-foreground hover:text-foreground text-sm">Cancel</button>
                 </div>
               </motion.form>
             )}
 
             {/* Products Table */}
-            <div className="glass rounded-2xl overflow-hidden">
-              <div className="p-5 border-b border-border"><h3 className="font-display font-semibold text-foreground">Your Products</h3></div>
+            <div className="bg-card rounded-2xl overflow-hidden border border-border/50 shadow-card">
+              <div className="p-4 border-b border-border"><h3 className="font-bold text-foreground text-sm">Your Products</h3></div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-border text-sm text-muted-foreground">
-                      <th className="text-left p-4">Product</th><th className="text-left p-4">Store</th><th className="text-right p-4">Price</th><th className="text-right p-4">Discount</th><th className="text-right p-4">Duration</th><th className="text-right p-4"></th>
+                    <tr className="border-b border-border text-xs text-muted-foreground">
+                      <th className="text-left p-3">Product</th><th className="text-left p-3">Store</th><th className="text-right p-3">Price</th><th className="text-right p-3">Discount</th><th className="text-right p-3">Duration</th><th className="text-right p-3"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {myProducts.map((p) => (
-                      <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                        <td className="p-4 font-medium text-foreground">{p.name}</td>
-                        <td className="p-4 text-muted-foreground">{p.storeName}</td>
-                        <td className="p-4 text-right text-foreground">₹{p.originalPrice}</td>
-                        <td className="p-4 text-right"><span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-sm font-semibold">{p.discountPercent}%</span></td>
-                        <td className="p-4 text-right text-muted-foreground">{p.offerDuration}</td>
-                        <td className="p-4 text-right"><button onClick={() => removeProduct(p.id)} className="text-sm text-destructive hover:underline">Remove</button></td>
+                      <tr key={p.id} className="border-b border-border/30 hover:bg-muted/20 transition-colors text-sm">
+                        <td className="p-3 font-medium text-foreground">{p.name}</td>
+                        <td className="p-3 text-muted-foreground">{p.storeName}</td>
+                        <td className="p-3 text-right text-foreground">₹{p.originalPrice}</td>
+                        <td className="p-3 text-right"><span className="px-2 py-0.5 rounded bg-success/10 text-success text-xs font-semibold">{p.discountPercent}%</span></td>
+                        <td className="p-3 text-right text-muted-foreground">{p.offerDuration}</td>
+                        <td className="p-3 text-right"><button onClick={() => removeProduct(p.id)} className="text-destructive hover:underline text-xs">Remove</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -128,50 +128,48 @@ export default function RetailerPage() {
               </div>
             </div>
 
-            {/* Category Demand Analytics */}
-            <div className="glass rounded-2xl p-6">
-              <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Category Demand Analytics</h3>
-              <div className="space-y-4">
+            {/* Demand Analytics */}
+            <div className="bg-card rounded-2xl p-5 border border-border/50 shadow-card">
+              <h3 className="font-bold text-foreground text-sm mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Category Demand</h3>
+              <div className="space-y-3">
                 {categoryDemand.map(cat => (
                   <div key={cat.category}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-foreground">{cat.category}</span>
+                      <span className="text-xs font-medium text-foreground">{cat.category}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{cat.searches.toLocaleString()} searches</span>
-                        <span className="text-xs text-deal-green flex items-center gap-0.5"><ArrowUp className="w-3 h-3" />{cat.growth}%</span>
+                        <span className="text-xs text-muted-foreground">{cat.searches.toLocaleString()}</span>
+                        <span className="text-[10px] text-success flex items-center gap-0.5"><ArrowUp className="w-3 h-3" />{cat.growth}%</span>
                       </div>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div className="gradient-primary h-2 rounded-full transition-all" style={{ width: `${(cat.searches / 4500) * 100}%` }} />
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div className="gradient-primary h-1.5 rounded-full transition-all" style={{ width: `${(cat.searches / 4500) * 100}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-4 rounded-xl bg-accent/10 border border-accent/20">
-                <p className="text-sm text-foreground flex items-center gap-2">
+              <div className="mt-4 p-3 rounded-xl bg-accent/5 border border-accent/10">
+                <p className="text-xs text-foreground flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-accent" />
-                  <strong>Insight:</strong> Crochet thread searches increased by 40% this week. Consider stocking craft supplies.
+                  <strong>Insight:</strong> Crochet thread searches increased by 40% this week.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Trending Searches */}
-          <div className="glass rounded-2xl p-6 h-fit">
-            <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2"><Search className="w-5 h-5 text-primary" /> Trending Searches</h3>
-            <p className="text-sm text-muted-foreground mb-4">What customers are looking for</p>
-            <div className="space-y-3">
+          {/* Trending */}
+          <div className="bg-card rounded-2xl p-5 h-fit border border-border/50 shadow-card">
+            <h3 className="font-bold text-foreground text-sm mb-4 flex items-center gap-2"><Search className="w-5 h-5 text-primary" /> Trending Searches</h3>
+            <div className="space-y-2">
               {trendingSearches.map((ts, i) => (
-                <div key={ts.term} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-muted-foreground w-5">{i + 1}</span>
-                    <span className="font-medium text-foreground">{ts.term}</span>
+                <div key={ts.term} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-muted-foreground w-4">{i + 1}</span>
+                    <span className="font-medium text-foreground text-sm">{ts.term}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-muted-foreground">{ts.count}</span>
-                    <span className="text-xs text-deal-green flex items-center gap-0.5 justify-end"><ArrowUp className="w-3 h-3" />{ts.growth}%</span>
+                    <span className="text-xs text-muted-foreground">{ts.count}</span>
+                    <span className="text-[10px] text-success flex items-center gap-0.5 justify-end"><ArrowUp className="w-3 h-3" />{ts.growth}%</span>
                   </div>
-                
                 </div>
               ))}
             </div>

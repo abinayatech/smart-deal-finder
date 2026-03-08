@@ -1,17 +1,20 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Star, MapPin, ArrowUpDown, Sparkles, ShoppingCart, Eye, Truck } from "lucide-react";
+import { Search, Star, MapPin, ArrowUpDown, Sparkles, ShoppingCart, Eye, Truck, Store, Filter, ClipboardList } from "lucide-react";
 import { products } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
+import { useShoppingMode } from "@/contexts/ShoppingModeContext";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [sortBy, setSortBy] = useState<"price" | "discount" | "distance">("price");
+  const [sortBy, setSortBy] = useState<"price" | "discount" | "distance">("discount");
+  const [filterDelivery, setFilterDelivery] = useState(false);
   const { addToCart } = useCart();
+  const { mode } = useShoppingMode();
   const { toast } = useToast();
 
   const results = useMemo(() => {
@@ -33,33 +36,37 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-24 md:pb-12">
       <div className="container mx-auto px-4">
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-10">
-          <div className="flex items-center glass rounded-2xl p-2">
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
+          <div className="flex items-center bg-card rounded-2xl p-2 border border-border/50 shadow-card">
             <Search className="w-5 h-5 ml-4 text-muted-foreground" />
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products..." className="flex-1 bg-transparent px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none font-body" />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products, brands, or stores..." className="flex-1 bg-transparent px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none" />
             <button type="submit" className="gradient-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold">Search</button>
           </div>
         </form>
 
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 flex-wrap">
             <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Sort by:</span>
-            {(["price", "discount", "distance"] as const).map((s) => (
-              <button key={s} onClick={() => setSortBy(s)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${sortBy === s ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"}`}>
-                {s.charAt(0).toUpperCase() + s.slice(1)}
+            {(["discount", "price", "distance"] as const).map((s) => (
+              <button key={s} onClick={() => setSortBy(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sortBy === s ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground"}`}>
+                {s === "discount" ? "Best Discount" : s === "price" ? "Lowest Price" : "Nearest"}
               </button>
             ))}
+            <button onClick={() => setFilterDelivery(!filterDelivery)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${filterDelivery ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+              <Truck className="w-3 h-3" /> Delivery
+            </button>
           </div>
-          <span className="text-sm text-muted-foreground">{results.length} products found</span>
+          <span className="text-sm text-muted-foreground">{results.length} products</span>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {results.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg">No products found. Try a different search.</p>
+              <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground text-lg">No products found</p>
+              <p className="text-sm text-muted-foreground">Try a different search term</p>
             </div>
           ) : (
             results.map((product, i) => {
@@ -71,45 +78,50 @@ export default function SearchPage() {
               });
 
               return (
-                <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 * Math.min(i, 10) }} className="glass rounded-2xl overflow-hidden">
+                <motion.div key={product.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 * Math.min(i, 15) }} className="bg-card rounded-2xl overflow-hidden border border-border/50 shadow-card hover:shadow-card-hover transition-all">
                   <div className="flex flex-col md:flex-row">
-                    <div className="w-full md:w-48 h-48 md:h-auto overflow-hidden cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                    <div className="w-full md:w-44 h-44 md:h-auto overflow-hidden cursor-pointer relative" onClick={() => navigate(`/product/${product.id}`)}>
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                    </div>
-                    <div className="flex-1 p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-display font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/product/${product.id}`)}>{product.name}</h3>
-                          <span className="text-sm text-muted-foreground">{product.category}</span>
+                      {mode === "delivery" && (
+                        <div className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1">
+                          <Truck className="w-3 h-3" /> Delivery
                         </div>
-                        <div className="flex gap-2">
-                          <button onClick={() => navigate(`/product/${product.id}`)} className="px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium flex items-center gap-1 hover:bg-muted transition-colors">
+                      )}
+                    </div>
+                    <div className="flex-1 p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-lg font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/product/${product.id}`)}>{product.name}</h3>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">{product.category}</span>
+                        </div>
+                        <div className="flex gap-1.5">
+                          <button onClick={() => navigate(`/product/${product.id}`)} className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium flex items-center gap-1 hover:bg-muted/80 transition-colors">
                             <Eye className="w-3 h-3" /> Details
                           </button>
                         </div>
                       </div>
 
-                      <div className="space-y-3">
-                        {sortedStores.map((store, si) => (
-                          <div key={store.storeName} className={`flex items-center justify-between p-3 rounded-xl transition-colors ${si === 0 ? "bg-primary/5 border border-primary/20" : "bg-secondary/50"}`}>
-                            <div className="flex items-center gap-3">
-                              {si === 0 && <span className="px-2 py-0.5 rounded-md bg-primary text-primary-foreground text-xs font-bold">BEST</span>}
+                      <div className="space-y-2">
+                        {sortedStores.slice(0, 3).map((store, si) => (
+                          <div key={store.storeName} className={`flex items-center justify-between p-3 rounded-xl transition-colors ${si === 0 ? "bg-primary/5 border border-primary/10" : "bg-muted/30"}`}>
+                            <div className="flex items-center gap-2">
+                              {si === 0 && <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">BEST</span>}
                               <div>
-                                <span className="font-semibold text-foreground">{store.storeName}</span>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span className="font-medium text-foreground text-sm">{store.storeName}</span>
+                                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                                   <MapPin className="w-3 h-3" />{store.distance}
-                                  <Star className="w-3 h-3 text-deal-yellow fill-deal-yellow" />{store.rating}
+                                  <Star className="w-3 h-3 text-accent fill-accent" />{store.rating}
                                   <Truck className="w-3 h-3" />₹{store.deliveryCharge}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <div className="text-right">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-lg font-bold text-primary">₹{store.finalPrice}</span>
-                                  <span className="text-sm text-muted-foreground line-through">₹{store.originalPrice}</span>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-base font-bold text-primary">₹{store.finalPrice}</span>
+                                  <span className="text-xs text-muted-foreground line-through">₹{store.originalPrice}</span>
                                 </div>
-                                <span className="text-xs font-semibold text-deal-green">{store.discountPercent}% off</span>
+                                <span className="text-[10px] font-semibold text-success">{store.discountPercent}% off</span>
                               </div>
                               <button onClick={() => handleAddToCart(product, store)} className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
                                 <ShoppingCart className="w-4 h-4" />
@@ -120,9 +132,9 @@ export default function SearchPage() {
                       </div>
 
                       {product.aiPrediction && (
-                        <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-accent/10 border border-accent/20">
+                        <div className="mt-3 flex items-start gap-2 p-3 rounded-xl bg-accent/5 border border-accent/10">
                           <Sparkles className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                          <p className="text-sm text-foreground">{product.aiPrediction}</p>
+                          <p className="text-xs text-foreground">{product.aiPrediction}</p>
                         </div>
                       )}
                     </div>
