@@ -7,7 +7,6 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center gradient-hero relative overflow-hidden">
-      {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
@@ -38,7 +37,7 @@ export default function RoleSelectionPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/login", { state: { role: "customer" } })}
             className="group relative bg-card/10 backdrop-blur-xl border border-primary-foreground/10 rounded-2xl p-8 text-left hover:bg-card/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-glow"
           >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
@@ -55,7 +54,7 @@ export default function RoleSelectionPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            onClick={() => navigate("/retailer")}
+            onClick={() => navigate("/login", { state: { role: "retailer" } })}
             className="group relative bg-card/10 backdrop-blur-xl border border-primary-foreground/10 rounded-2xl p-8 text-left hover:bg-card/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-glow"
           >
             <div className="w-16 h-16 rounded-2xl gradient-accent flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
@@ -69,7 +68,6 @@ export default function RoleSelectionPage() {
           </motion.button>
         </div>
 
-        {/* Feature highlights */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
