@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Plus, TrendingUp, Package, Percent, Clock, Search, BarChart3, ArrowUp, Eye, Trash2 } from "lucide-react";
+import { LayoutDashboard, Plus, TrendingUp, Package, Percent, Clock, Search, BarChart3, ArrowUp, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface RetailerProduct {
   id: string;
@@ -23,8 +24,6 @@ const trendingSearches = [
   { term: "Coffee Beans", count: 856, growth: 12 },
   { term: "Crochet Thread", count: 743, growth: 40 },
   { term: "Running Shoes", count: 621, growth: 8 },
-  { term: "Yoga Mat", count: 534, growth: 22 },
-  { term: "Laptop Stand", count: 498, growth: 5 },
 ];
 
 const categoryDemand = [
@@ -36,28 +35,21 @@ const categoryDemand = [
 ];
 
 export default function RetailerPage() {
-  const [myProducts, setMyProducts] = useState<RetailerProduct[]>(initialProducts);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", storeName: "", originalPrice: "", discountPercent: "", offerDuration: "" });
-
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    setMyProducts([...myProducts, { id: Date.now().toString(), name: form.name, storeName: form.storeName, originalPrice: Number(form.originalPrice), discountPercent: Number(form.discountPercent), offerDuration: form.offerDuration }]);
-    setForm({ name: "", storeName: "", originalPrice: "", discountPercent: "", offerDuration: "" });
-    setShowForm(false);
-  };
-
-  const removeProduct = (id: string) => setMyProducts(myProducts.filter((p) => p.id !== id));
+  const [myProducts] = useState<RetailerProduct[]>(initialProducts);
 
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-12">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="w-7 h-7 text-primary" /> Retailer Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-1">Manage products, offers, and analytics</p>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <LayoutDashboard className="w-7 h-7 text-primary" /> Retailer Dashboard
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">Overview of your store performance</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} className="gradient-primary text-primary-foreground px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg"><Plus className="w-4 h-4" /> Add Product</button>
+          <Link to="/retailer/add-product" className="gradient-primary text-primary-foreground px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg">
+            <Plus className="w-4 h-4" /> Add Product
+          </Link>
         </div>
 
         {/* Stats */}
@@ -76,51 +68,50 @@ export default function RetailerPage() {
           ))}
         </div>
 
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {[
+            { to: "/retailer/products", label: "All Products", icon: Package },
+            { to: "/retailer/add-product", label: "Add Product", icon: Plus },
+            { to: "/retailer/analytics", label: "Analytics", icon: BarChart3 },
+            { to: "/retailer/trending", label: "Trending", icon: TrendingUp },
+          ].map(link => (
+            <Link key={link.to} to={link.to} className="bg-card rounded-xl p-4 border border-border/50 shadow-card hover:shadow-lg transition-shadow flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <link.icon className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">{link.label}</span>
+            </Link>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            {showForm && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} onSubmit={handleAdd} className="bg-card rounded-2xl p-6 space-y-4 border border-border/50 shadow-card">
-                <h3 className="font-bold text-foreground text-sm">Add New Product</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {[
-                    { key: "name", label: "Product Name", type: "text", placeholder: "e.g. Oreo Biscuit" },
-                    { key: "storeName", label: "Store Name", type: "text", placeholder: "e.g. My Store" },
-                    { key: "originalPrice", label: "Original Price (₹)", type: "number", placeholder: "40" },
-                    { key: "discountPercent", label: "Discount %", type: "number", placeholder: "25" },
-                    { key: "offerDuration", label: "Offer Duration", type: "text", placeholder: "e.g. 7 days" },
-                  ].map((field) => (
-                    <div key={field.key}>
-                      <label className="text-xs text-muted-foreground">{field.label}</label>
-                      <input type={field.type} placeholder={field.placeholder} value={form[field.key as keyof typeof form]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} required className="w-full bg-muted/30 rounded-lg px-4 py-2 mt-1 text-foreground placeholder:text-muted-foreground outline-none border border-border/50 focus:ring-2 focus:ring-primary/20 text-sm" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-3">
-                  <button type="submit" className="gradient-primary text-primary-foreground px-5 py-2 rounded-xl font-medium text-sm shadow-lg">Save Product</button>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2 rounded-xl text-muted-foreground hover:text-foreground text-sm">Cancel</button>
-                </div>
-              </motion.form>
-            )}
-
-            {/* Products Table */}
+            {/* Recent Products */}
             <div className="bg-card rounded-2xl overflow-hidden border border-border/50 shadow-card">
-              <div className="p-4 border-b border-border"><h3 className="font-bold text-foreground text-sm">Your Products</h3></div>
+              <div className="p-4 border-b border-border flex items-center justify-between">
+                <h3 className="font-bold text-foreground text-sm">Recent Products</h3>
+                <Link to="/retailer/products" className="text-xs text-primary font-medium hover:underline">View All</Link>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border text-xs text-muted-foreground">
-                      <th className="text-left p-3">Product</th><th className="text-left p-3">Store</th><th className="text-right p-3">Price</th><th className="text-right p-3">Discount</th><th className="text-right p-3">Duration</th><th className="text-right p-3"></th>
+                      <th className="text-left p-3">Product</th>
+                      <th className="text-right p-3">Price</th>
+                      <th className="text-right p-3">Discount</th>
+                      <th className="text-right p-3">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
                     {myProducts.map((p) => (
                       <tr key={p.id} className="border-b border-border/30 hover:bg-muted/20 transition-colors text-sm">
                         <td className="p-3 font-medium text-foreground">{p.name}</td>
-                        <td className="p-3 text-muted-foreground">{p.storeName}</td>
                         <td className="p-3 text-right text-foreground">₹{p.originalPrice}</td>
-                        <td className="p-3 text-right"><span className="px-2 py-0.5 rounded bg-success/10 text-success text-xs font-semibold">{p.discountPercent}%</span></td>
+                        <td className="p-3 text-right">
+                          <span className="px-2 py-0.5 rounded bg-success/10 text-success text-xs font-semibold">{p.discountPercent}%</span>
+                        </td>
                         <td className="p-3 text-right text-muted-foreground">{p.offerDuration}</td>
-                        <td className="p-3 text-right"><button onClick={() => removeProduct(p.id)} className="text-destructive hover:underline text-xs">Remove</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -130,7 +121,9 @@ export default function RetailerPage() {
 
             {/* Demand Analytics */}
             <div className="bg-card rounded-2xl p-5 border border-border/50 shadow-card">
-              <h3 className="font-bold text-foreground text-sm mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Category Demand</h3>
+              <h3 className="font-bold text-foreground text-sm mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" /> Category Demand
+              </h3>
               <div className="space-y-3">
                 {categoryDemand.map(cat => (
                   <div key={cat.category}>
@@ -138,7 +131,9 @@ export default function RetailerPage() {
                       <span className="text-xs font-medium text-foreground">{cat.category}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">{cat.searches.toLocaleString()}</span>
-                        <span className="text-[10px] text-success flex items-center gap-0.5"><ArrowUp className="w-3 h-3" />{cat.growth}%</span>
+                        <span className="text-[10px] text-success flex items-center gap-0.5">
+                          <ArrowUp className="w-3 h-3" />{cat.growth}%
+                        </span>
                       </div>
                     </div>
                     <div className="w-full bg-muted rounded-full h-1.5">
@@ -158,7 +153,12 @@ export default function RetailerPage() {
 
           {/* Trending */}
           <div className="bg-card rounded-2xl p-5 h-fit border border-border/50 shadow-card">
-            <h3 className="font-bold text-foreground text-sm mb-4 flex items-center gap-2"><Search className="w-5 h-5 text-primary" /> Trending Searches</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+                <Search className="w-5 h-5 text-primary" /> Trending
+              </h3>
+              <Link to="/retailer/trending" className="text-xs text-primary font-medium hover:underline">View All</Link>
+            </div>
             <div className="space-y-2">
               {trendingSearches.map((ts, i) => (
                 <div key={ts.term} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30">
@@ -168,7 +168,9 @@ export default function RetailerPage() {
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-muted-foreground">{ts.count}</span>
-                    <span className="text-[10px] text-success flex items-center gap-0.5 justify-end"><ArrowUp className="w-3 h-3" />{ts.growth}%</span>
+                    <span className="text-[10px] text-success flex items-center gap-0.5 justify-end">
+                      <ArrowUp className="w-3 h-3" />{ts.growth}%
+                    </span>
                   </div>
                 </div>
               ))}
